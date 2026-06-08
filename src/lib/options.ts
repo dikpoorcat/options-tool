@@ -24,8 +24,16 @@ export function daysToExpiry(expiryMs: number, nowMs: number) {
 }
 
 export function annualizedYield(premium: number, denominator: number, days: number) {
-  if (premium <= 0 || denominator <= 0 || days <= 0) return null;
+  if (denominator <= 0 || days <= 0) return null;
   return (premium / denominator) * (365 / days) * 100;
+}
+
+export function shortPutNetPremium(premium: number, strike: number, indexPrice: number | null | undefined) {
+  if (!Number.isFinite(premium)) return null;
+  if (indexPrice === null || indexPrice === undefined || !Number.isFinite(indexPrice)) return premium;
+
+  const intrinsicLoss = Math.max(0, strike - indexPrice);
+  return premium - intrinsicLoss;
 }
 
 export function selectNearbyStrikes(strikes: number[], referencePrice: number, count: number) {
@@ -49,7 +57,8 @@ export function filterStrikesByInterval(strikes: number[], interval: number) {
 export function buildMatrix(
   contracts: OptionContract[],
   selectedStrikes: number[],
-  marginPerContract: number
+  marginPerContract: number,
+  indexPrice?: number | null
 ): MatrixRow[] {
   const rows = new Map<number, MatrixRow>();
 
@@ -66,11 +75,13 @@ export function buildMatrix(
       };
 
     const premium = contract.markPrice ?? 0;
+    const netPremium = shortPutNetPremium(premium, contract.strike, indexPrice) ?? 0;
     row.cells[contract.strike] = {
       contract,
       premium,
-      actualYield: annualizedYield(premium, marginPerContract, contract.daysToExpiry),
-      cashSecuredYield: annualizedYield(premium, contract.strike, contract.daysToExpiry)
+      netPremium,
+      actualYield: annualizedYield(netPremium, marginPerContract, contract.daysToExpiry),
+      cashSecuredYield: annualizedYield(netPremium, contract.strike, contract.daysToExpiry)
     };
     rows.set(contract.expiry, row);
   }

@@ -24,6 +24,7 @@ export interface OptionSnapshot {
 export interface MatrixCell {
   contract: OptionContract | null;
   premium: number;
+  netPremium: number;
   actualYield: number | null;
   cashSecuredYield: number | null;
 }

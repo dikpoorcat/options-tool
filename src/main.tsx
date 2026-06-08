@@ -76,7 +76,7 @@ function App() {
   }, [lockedStrikes, referencePrice, strikeCount, strikeInterval, strikes]);
 
   const rows = React.useMemo(
-    () => buildMatrix(snapshot?.contracts ?? [], selectedStrikes, margin),
+    () => buildMatrix(snapshot?.contracts ?? [], selectedStrikes, margin, snapshot?.indexPrice),
     [margin, selectedStrikes, snapshot]
   );
 
@@ -201,6 +201,9 @@ function App() {
                         <>
                           <div className="bar" style={{ width: `${barWidth}%` }} />
                           <span className="premium">{formatNumber(cell.premium, 2)}</span>
+                          {cell.netPremium !== cell.premium ? (
+                            <span className="net-premium">Net {formatNumber(cell.netPremium, 2)}</span>
+                          ) : null}
                           <strong>{formatPercent(yieldValue)}</strong>
                         </>
                       ) : (

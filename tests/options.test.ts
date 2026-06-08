@@ -5,6 +5,7 @@ import {
   daysToExpiry,
   filterStrikesByInterval,
   parseOptionSymbol,
+  shortPutNetPremium,
   selectNearbyStrikes
 } from "../src/lib/options";
 import type { OptionContract } from "../src/types";
@@ -28,7 +29,12 @@ describe("option helpers", () => {
 
   it("calculates annualized yields", () => {
     expect(annualizedYield(100, 10000, 10)).toBeCloseTo(36.5);
-    expect(annualizedYield(0, 10000, 10)).toBeNull();
+    expect(annualizedYield(0, 10000, 10)).toBe(0);
+  });
+
+  it("subtracts current intrinsic loss from short put premium", () => {
+    expect(shortPutNetPremium(800, 63000, 62500)).toBe(300);
+    expect(shortPutNetPremium(800, 62000, 62500)).toBe(800);
   });
 
   it("selects nearby strikes around a reference price", () => {
@@ -55,9 +61,10 @@ describe("option helpers", () => {
       }
     ];
 
-    const rows = buildMatrix(contracts, [62000], 10000);
+    const rows = buildMatrix(contracts, [62000], 10000, 61500);
     expect(rows).toHaveLength(1);
-    expect(rows[0].cells[62000].actualYield).toBeCloseTo(365);
-    expect(rows[0].cells[62000].cashSecuredYield).toBeCloseTo(58.8709);
+    expect(rows[0].cells[62000].netPremium).toBe(500);
+    expect(rows[0].cells[62000].actualYield).toBeCloseTo(182.5);
+    expect(rows[0].cells[62000].cashSecuredYield).toBeCloseTo(29.4354);
   });
 });

@@ -221,6 +221,12 @@ thead th {
   font-size: 13px;
 }
 
+.net-premium {
+  display: block;
+  color: #7a4a00;
+  font-size: 12px;
+}
+
 .yield-cell strong {
   display: block;
   font-size: 19px;
