@@ -16,7 +16,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -74,7 +75,7 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  grid-template-columns: repeat(6, minmax(140px, 1fr));
   gap: 12px;
   align-items: end;
   margin-bottom: 10px;
@@ -91,6 +92,7 @@ h1 {
 }
 
 .controls input,
+.controls select,
 .controls output {
   min-height: 42px;
   border: 1px solid #ccd1ce;

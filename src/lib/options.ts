@@ -41,6 +41,11 @@ export function selectNearbyStrikes(strikes: number[], referencePrice: number, c
     .sort((a, b) => b - a);
 }
 
+export function filterStrikesByInterval(strikes: number[], interval: number) {
+  if (!Number.isFinite(interval) || interval <= 0) return strikes;
+  return strikes.filter((strike) => strike % interval === 0);
+}
+
 export function buildMatrix(
   contracts: OptionContract[],
   selectedStrikes: number[],

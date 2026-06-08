@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { annualizedYield, buildMatrix, daysToExpiry, parseOptionSymbol, selectNearbyStrikes } from "../src/lib/options";
+import {
+  annualizedYield,
+  buildMatrix,
+  daysToExpiry,
+  filterStrikesByInterval,
+  parseOptionSymbol,
+  selectNearbyStrikes
+} from "../src/lib/options";
 import type { OptionContract } from "../src/types";
 
 describe("option helpers", () => {
@@ -28,6 +35,11 @@ describe("option helpers", () => {
     expect(selectNearbyStrikes([60000, 61000, 62000, 63000, 64000], 62500, 4)).toEqual([
       64000, 63000, 62000, 61000
     ]);
+  });
+
+  it("filters strikes by interval", () => {
+    expect(filterStrikesByInterval([62000, 62500, 63000, 63500], 1000)).toEqual([62000, 63000]);
+    expect(filterStrikesByInterval([62000, 62500, 63000, 63500], 500)).toEqual([62000, 62500, 63000, 63500]);
   });
 
   it("builds matrix rows with actual and cash-secured yields", () => {

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RefreshCw } from "lucide-react";
-import { buildMatrix, selectNearbyStrikes } from "./lib/options";
+import { buildMatrix, filterStrikesByInterval, selectNearbyStrikes } from "./lib/options";
 import type { OptionSnapshot, YieldMode } from "./types";
 import "./styles.css";
 
@@ -54,6 +54,7 @@ function App() {
   const [margin, setMargin] = React.useState(10000);
   const [referencePrice, setReferencePrice] = React.useState<number | "">("");
   const [strikeCount, setStrikeCount] = React.useState(4);
+  const [strikeInterval, setStrikeInterval] = React.useState(1000);
   const [yieldMode, setYieldMode] = React.useState<YieldMode>("actual");
   const [lockedStrikes, setLockedStrikes] = React.useState<number[]>([]);
 
@@ -69,9 +70,10 @@ function App() {
   );
 
   const selectedStrikes = React.useMemo(() => {
-    const auto = selectNearbyStrikes(strikes, Number(referencePrice), strikeCount);
+    const intervalStrikes = filterStrikesByInterval(strikes, strikeInterval);
+    const auto = selectNearbyStrikes(intervalStrikes, Number(referencePrice), strikeCount);
     return Array.from(new Set([...auto, ...lockedStrikes])).sort((a, b) => b - a);
-  }, [lockedStrikes, referencePrice, strikeCount, strikes]);
+  }, [lockedStrikes, referencePrice, strikeCount, strikeInterval, strikes]);
 
   const rows = React.useMemo(
     () => buildMatrix(snapshot?.contracts ?? [], selectedStrikes, margin),
@@ -132,6 +134,17 @@ function App() {
             min="1"
             max="12"
           />
+        </label>
+        <label>
+          <span>Strike Interval</span>
+          <select value={strikeInterval} onChange={(event) => setStrikeInterval(Number(event.target.value))}>
+            <option value="100">100</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+            <option value="2500">2500</option>
+            <option value="5000">5000</option>
+          </select>
         </label>
         <div className="segmented" role="group" aria-label="Yield mode">
           <button className={yieldMode === "actual" ? "active" : ""} onClick={() => setYieldMode("actual")}>
