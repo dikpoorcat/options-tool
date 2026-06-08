@@ -6,6 +6,7 @@ import type { OptionSnapshot, YieldMode } from "./types";
 import "./styles.css";
 
 const REFRESH_MS = 30_000;
+const API_BASE = import.meta.env.BASE_URL;
 
 function formatNumber(value: number | null | undefined, digits = 0) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "-";
@@ -42,7 +43,7 @@ function useOptionSnapshot() {
   const load = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/options/btc-put");
+      const response = await fetch(`${API_BASE}api/options/btc-put`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Load failed");
       setSnapshot(data);
