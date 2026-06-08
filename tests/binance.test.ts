@@ -1,37 +1,31 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { request } from "undici";
-import { fetchBtcPutSnapshot } from "../server/binance";
-
-vi.mock("undici", () => ({
-  request: vi.fn(),
-  ProxyAgent: class ProxyAgent {
-    constructor(public url: string) {}
-  }
-}));
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearBtcPutSnapshotCache, fetchBtcPutSnapshot } from "../src/lib/binance";
 
 function jsonResponse(body: unknown) {
   return {
-    statusCode: 200,
-    body: {
-      text: async () => JSON.stringify(body)
-    }
-  } as unknown as Awaited<ReturnType<typeof request>>;
+    ok: true,
+    status: 200,
+    json: async () => body
+  } as Response;
 }
 
 describe("Binance snapshot loader", () => {
-  const requestMock = vi.mocked(request);
+  beforeEach(() => {
+    clearBtcPutSnapshotCache();
+  });
 
   afterEach(() => {
-    requestMock.mockReset();
+    vi.unstubAllGlobals();
   });
 
   it("combines exchange info, mark prices, and index price into BTC put contracts", async () => {
     const now = Date.UTC(2026, 5, 8);
     const expiry = now + 10 * 24 * 60 * 60 * 1000;
 
-    requestMock.mockImplementation(async (url) => {
-      const requestUrl = String(url);
-        if (requestUrl.includes("/exchangeInfo")) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (url.includes("/exchangeInfo")) {
           return jsonResponse({
             serverTime: now,
             optionSymbols: [
@@ -53,7 +47,7 @@ describe("Binance snapshot loader", () => {
           });
         }
 
-        if (requestUrl.includes("/mark")) {
+        if (url.includes("/mark")) {
           return jsonResponse([
             {
               symbol: "BTC-260618-62000-P",
@@ -65,7 +59,8 @@ describe("Binance snapshot loader", () => {
         return jsonResponse({
           indexPrice: "62500"
         });
-    });
+      })
+    );
 
     const snapshot = await fetchBtcPutSnapshot(now);
 
@@ -84,9 +79,10 @@ describe("Binance snapshot loader", () => {
     const futureExpiry = now + 7 * 24 * 60 * 60 * 1000;
     const pastExpiry = now - 24 * 60 * 60 * 1000;
 
-    requestMock.mockImplementation(async (url) => {
-      const requestUrl = String(url);
-        if (requestUrl.includes("/exchangeInfo")) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (url.includes("/exchangeInfo")) {
           return jsonResponse({
             serverTime: now,
             optionSymbols: [
@@ -129,7 +125,7 @@ describe("Binance snapshot loader", () => {
           });
         }
 
-        if (requestUrl.includes("/mark")) {
+        if (url.includes("/mark")) {
           return jsonResponse([
             {
               symbol: "BTC-260615-61000-P",
@@ -141,7 +137,8 @@ describe("Binance snapshot loader", () => {
         return jsonResponse({
           indexPrice: "62000"
         });
-    });
+      })
+    );
 
     const snapshot = await fetchBtcPutSnapshot(now);
 
@@ -151,7 +148,8 @@ describe("Binance snapshot loader", () => {
   it("returns the last successful snapshot as stale data after a later Binance failure", async () => {
     const now = Date.UTC(2026, 5, 8);
     const expiry = now + 3 * 24 * 60 * 60 * 1000;
-    requestMock
+    const fetchMock = vi
+      .fn()
       .mockImplementationOnce(async () =>
         jsonResponse({
           serverTime: now,
@@ -180,6 +178,8 @@ describe("Binance snapshot loader", () => {
         })
       )
       .mockRejectedValue(new Error("network down"));
+
+    vi.stubGlobal("fetch", fetchMock);
 
     const fresh = await fetchBtcPutSnapshot(now);
     const stale = await fetchBtcPutSnapshot(now + 60_000);

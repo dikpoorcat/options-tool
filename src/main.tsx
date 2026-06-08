@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RefreshCw } from "lucide-react";
+import { fetchBtcPutSnapshot } from "./lib/binance";
 import { buildMatrix, filterStrikesByInterval, selectNearbyStrikes } from "./lib/options";
 import type { OptionSnapshot, YieldMode } from "./types";
 import "./styles.css";
@@ -42,9 +43,7 @@ function useOptionSnapshot() {
   const load = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/options/btc-put");
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Load failed");
+      const data = await fetchBtcPutSnapshot();
       setSnapshot(data);
       setError(data.sourceError ?? null);
     } catch (requestError) {
