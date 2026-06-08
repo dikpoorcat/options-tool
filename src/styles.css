@@ -1,0 +1,257 @@
+:root {
+  color: #151719;
+  background: #f7f8f5;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.top-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0 22px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #5e646b;
+  font-size: 13px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: 0;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cfd4d1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #151719;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.icon-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.controls span {
+  color: #596067;
+  font-size: 13px;
+}
+
+.controls input,
+.controls output {
+  min-height: 42px;
+  border: 1px solid #ccd1ce;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 9px 10px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #cfd4d1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.segmented button {
+  min-height: 42px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: #24313a;
+  color: #ffffff;
+}
+
+.status-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 28px;
+  color: #5c6369;
+  font-size: 13px;
+}
+
+.status-line strong {
+  color: #b44d00;
+}
+
+.matrix-wrap {
+  overflow: auto;
+  border: 1px solid #d8ddd9;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+table {
+  width: 100%;
+  min-width: 880px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e0e4e1;
+  border-right: 1px solid #e6e9e6;
+  padding: 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f2f4f1;
+  font-weight: 700;
+}
+
+.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: inherit;
+  text-align: left;
+}
+
+.row-title {
+  background: #ffffff;
+}
+
+.days {
+  color: #ff7900;
+  font-weight: 700;
+}
+
+.strike {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.strike.locked {
+  background: #ffb936;
+}
+
+.yield-cell {
+  position: relative;
+  min-width: 138px;
+  height: 58px;
+  overflow: hidden;
+}
+
+.yield-cell .bar {
+  position: absolute;
+  inset: 8px auto 8px 0;
+  z-index: 0;
+  background: #ffb936;
+}
+
+.yield-cell span,
+.yield-cell strong {
+  position: relative;
+  z-index: 1;
+}
+
+.premium {
+  display: block;
+  color: #151719;
+  font-size: 13px;
+}
+
+.yield-cell strong {
+  display: block;
+  font-size: 19px;
+}
+
+.empty,
+.empty-state {
+  color: #9a9fa4;
+}
+
+.empty-state {
+  padding: 24px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .top-band {
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .segmented {
+    grid-column: 1 / -1;
+  }
+}
