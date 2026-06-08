@@ -1,6 +1,6 @@
 :root {
   color: #151719;
-  background: #f7f8f5;
+  background: #f5f7f6;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   font-synthesis: none;
@@ -13,17 +13,22 @@
 
 body {
   margin: 0;
+  background:
+    linear-gradient(180deg, #ffffff 0, #f5f7f6 260px),
+    #f5f7f6;
 }
 
 button,
 input,
-select {
+select,
+output {
   font: inherit;
 }
 
 .app-shell {
   min-height: 100vh;
   padding: 24px;
+  color: #151719;
 }
 
 .top-band {
@@ -31,18 +36,20 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px 0 22px;
+  padding: 12px 0 20px;
 }
 
 .eyebrow {
   margin: 0 0 4px;
-  color: #5e646b;
+  color: #667078;
   font-size: 13px;
+  font-weight: 650;
 }
 
 h1 {
   margin: 0;
-  font-size: 32px;
+  font-size: 30px;
+  line-height: 1.1;
   letter-spacing: 0;
 }
 
@@ -50,12 +57,15 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #cfd4d1;
+  min-height: 42px;
+  border: 1px solid #c9d0cc;
   border-radius: 8px;
   background: #ffffff;
   color: #151719;
-  padding: 10px 14px;
+  padding: 9px 14px;
   cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgb(21 23 25 / 6%);
 }
 
 .icon-button:disabled {
@@ -75,50 +85,82 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: repeat(6, minmax(140px, 1fr));
   gap: 12px;
-  align-items: end;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.controls label {
+.control-grid {
   display: grid;
-  gap: 6px;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 12px;
 }
 
-.controls span {
-  color: #596067;
-  font-size: 13px;
-}
-
-.controls input,
-.controls select,
-.controls output {
-  min-height: 42px;
-  border: 1px solid #ccd1ce;
+.control-field {
+  display: grid;
+  grid-template-rows: auto 42px;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d7ddda;
   border-radius: 8px;
   background: #ffffff;
-  padding: 9px 10px;
+  box-shadow: 0 1px 2px rgb(21 23 25 / 4%);
 }
 
-.segmented {
+.control-field span {
+  min-width: 0;
+  color: #657078;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.control-field input,
+.control-field select,
+.control-field output {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  border: 1px solid #cbd3cf;
+  border-radius: 8px;
+  background: #fafbf9;
+  color: #151719;
+  padding: 8px 10px;
+  font-weight: 750;
+}
+
+.control-field input:focus,
+.control-field select:focus {
+  border-color: #6e7f89;
+  outline: 3px solid rgb(110 127 137 / 16%);
+}
+
+.mode-toggle {
+  justify-self: start;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid #cfd4d1;
+  width: min(100%, 360px);
+  min-height: 42px;
+  border: 1px solid #cbd3cf;
   border-radius: 8px;
   overflow: hidden;
   background: #ffffff;
+  box-shadow: 0 1px 2px rgb(21 23 25 / 4%);
 }
 
-.segmented button {
-  min-height: 42px;
+.mode-toggle button {
+  height: 42px;
   border: 0;
   background: transparent;
+  color: #3f484f;
   cursor: pointer;
+  font-weight: 750;
 }
 
-.segmented button.active {
-  background: #24313a;
+.mode-toggle button.active {
+  background: #25323a;
   color: #ffffff;
 }
 
@@ -126,9 +168,11 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  min-height: 28px;
-  color: #5c6369;
+  align-items: center;
+  min-height: 30px;
+  color: #687178;
   font-size: 13px;
+  font-weight: 650;
 }
 
 .status-line strong {
@@ -137,14 +181,15 @@ h1 {
 
 .matrix-wrap {
   overflow: auto;
-  border: 1px solid #d8ddd9;
+  border: 1px solid #d5dcd8;
   border-radius: 8px;
   background: #ffffff;
+  box-shadow: 0 1px 3px rgb(21 23 25 / 5%);
 }
 
 table {
   width: 100%;
-  min-width: 880px;
+  min-width: 840px;
   border-collapse: collapse;
 }
 
@@ -152,7 +197,7 @@ th,
 td {
   border-bottom: 1px solid #e0e4e1;
   border-right: 1px solid #e6e9e6;
-  padding: 10px;
+  padding: 9px 10px;
   text-align: right;
   white-space: nowrap;
 }
@@ -161,24 +206,23 @@ thead th {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #f2f4f1;
+  background: #eef2ef;
   font-weight: 700;
 }
 
-.sticky {
-  position: sticky;
-  left: 0;
-  z-index: 3;
-  background: inherit;
+.expiry-col {
   text-align: left;
+  min-width: 112px;
 }
 
 .row-title {
   background: #ffffff;
+  color: #2d353b;
+  font-weight: 800;
 }
 
 .days {
-  color: #ff7900;
+  color: #d96d00;
   font-weight: 700;
 }
 
@@ -189,24 +233,29 @@ thead th {
   padding: 6px 8px;
   cursor: pointer;
   font-weight: 800;
+  color: #151719;
 }
 
 .strike.locked {
-  background: #ffb936;
+  background: #ffd15c;
 }
 
 .yield-cell {
   position: relative;
-  min-width: 138px;
-  height: 58px;
+  min-width: 128px;
+  height: 56px;
   overflow: hidden;
+  background: #ffffff;
 }
 
 .yield-cell .bar {
   position: absolute;
-  inset: 8px auto 8px 0;
+  inset: 7px auto 7px 0;
   z-index: 0;
-  background: #ffb936;
+  max-width: calc(100% - 8px);
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(90deg, #ffca4f, #ffe19b);
+  opacity: 0.85;
 }
 
 .yield-cell span,
@@ -218,18 +267,21 @@ thead th {
 .premium {
   display: block;
   color: #151719;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .net-premium {
   display: block;
-  color: #7a4a00;
+  color: #745100;
   font-size: 12px;
+  line-height: 1.15;
 }
 
 .yield-cell strong {
   display: block;
-  font-size: 19px;
+  font-size: 18px;
+  line-height: 1.1;
 }
 
 .empty,
@@ -249,17 +301,70 @@ thead th {
 
   .top-band {
     align-items: flex-start;
+    padding-top: 8px;
   }
 
   h1 {
     font-size: 26px;
   }
 
-  .controls {
+  .control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .segmented {
-    grid-column: 1 / -1;
+  .mode-toggle {
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  table {
+    min-width: 760px;
+  }
+
+  th,
+  td {
+    padding: 8px;
+  }
+
+  .expiry-col {
+    min-width: 96px;
+  }
+
+  .yield-cell {
+    min-width: 118px;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .top-band {
+    gap: 12px;
+  }
+
+  .icon-button span {
+    display: none;
+  }
+
+  .control-grid {
+    gap: 10px;
+  }
+
+  .control-field {
+    padding: 9px;
+  }
+
+  .control-field span {
+    font-size: 12px;
+  }
+
+  .mode-toggle button {
+    font-size: 13px;
+  }
+
+  .status-line {
+    gap: 8px;
   }
 }
