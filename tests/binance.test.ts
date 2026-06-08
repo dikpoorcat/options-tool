@@ -22,9 +22,7 @@ describe("Binance snapshot loader", () => {
     const now = Date.UTC(2026, 5, 8);
     const expiry = now + 10 * 24 * 60 * 60 * 1000;
 
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (url: string) => {
+    const fetchMock = vi.fn(async (url: string) => {
         if (url.includes("/exchangeInfo")) {
           return jsonResponse({
             serverTime: now,
@@ -59,11 +57,15 @@ describe("Binance snapshot loader", () => {
         return jsonResponse({
           indexPrice: "62500"
         });
-      })
-    );
+      });
+
+    vi.stubGlobal("fetch", fetchMock);
 
     const snapshot = await fetchBtcPutSnapshot(now);
 
+    expect(fetchMock).toHaveBeenCalledWith("/eapi/v1/exchangeInfo");
+    expect(fetchMock).toHaveBeenCalledWith("/eapi/v1/mark");
+    expect(fetchMock).toHaveBeenCalledWith("/eapi/v1/index?underlying=BTCUSDT");
     expect(snapshot.indexPrice).toBe(62500);
     expect(snapshot.contracts).toHaveLength(1);
     expect(snapshot.contracts[0]).toMatchObject({

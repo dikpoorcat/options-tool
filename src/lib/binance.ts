@@ -1,7 +1,7 @@
 import { daysToExpiry, formatExpiry, parseOptionSymbol } from "./options";
 import type { OptionContract, OptionSnapshot } from "../types";
 
-const BASE_URL = "https://eapi.binance.com";
+const BASE_URL = import.meta.env.VITE_BINANCE_API_BASE ?? "/eapi";
 
 interface BinanceExchangeInfo {
   serverTime?: number;
@@ -46,9 +46,9 @@ export function clearBtcPutSnapshotCache() {
 export async function fetchBtcPutSnapshot(nowMs = Date.now()): Promise<OptionSnapshot> {
   try {
     const [exchangeInfo, marks, index] = await Promise.all([
-      requestJson<BinanceExchangeInfo>("/eapi/v1/exchangeInfo"),
-      requestJson<BinanceMark[]>("/eapi/v1/mark"),
-      requestJson<BinanceIndex>("/eapi/v1/index?underlying=BTCUSDT")
+      requestJson<BinanceExchangeInfo>("/v1/exchangeInfo"),
+      requestJson<BinanceMark[]>("/v1/mark"),
+      requestJson<BinanceIndex>("/v1/index?underlying=BTCUSDT")
     ]);
 
     const markBySymbol = new Map(marks.map((mark) => [mark.symbol, toNumber(mark.markPrice)]));

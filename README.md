@@ -1,6 +1,6 @@
 # BTC 期权卖 Put 年化工具
 
-这是一个纯前端静态网页工具，用浏览器直接请求 Binance European Options 公共行情接口，自动更新 BTC Put 标记价并计算卖 Put 年化收益。
+这是一个纯前端静态网页工具，用浏览器请求 Binance European Options 公共行情接口，自动更新 BTC Put 标记价并计算卖 Put 年化收益。
 
 第一版不需要 Binance API Key，不下单，不读取账户，也不需要 Node 后端服务。
 
@@ -36,6 +36,8 @@ npm run dev
 http://127.0.0.1:5173
 ```
 
+本地开发时，Vite 会把同域 `/eapi/...` 请求代理到 `https://eapi.binance.com/eapi/...`，避免浏览器 CORS 报错。
+
 ## 编译和手动部署
 
 编译静态文件：
@@ -59,6 +61,16 @@ npm run build
 
 注意是上传 `dist` 里面的内容，不是把 `dist` 文件夹整体放进去。
 
+生产 Nginx 需要额外把 `/eapi/` 反代到 Binance，例如：
+
+```nginx
+location /eapi/ {
+    proxy_pass https://eapi.binance.com/eapi/;
+    proxy_set_header Host eapi.binance.com;
+    proxy_ssl_server_name on;
+}
+```
+
 ## 常用命令
 
 ```powershell
@@ -68,12 +80,12 @@ npm run build
 
 ## 数据来源
 
-浏览器直接请求 Binance Options 公共接口：
+浏览器请求同域 `/eapi/...`，由 Vite 或 Nginx 转发到 Binance Options 公共接口：
 
-- `https://eapi.binance.com/eapi/v1/exchangeInfo`
-- `https://eapi.binance.com/eapi/v1/mark`
-- `https://eapi.binance.com/eapi/v1/index?underlying=BTCUSDT`
+- `/eapi/v1/exchangeInfo`
+- `/eapi/v1/mark`
+- `/eapi/v1/index?underlying=BTCUSDT`
 
 当前权利金口径使用 option `markPrice`，不是 bid、ask 或 last price。
 
-如果生产环境遇到跨域或网络限制，需要在 Nginx、域名或其他网关层处理；本项目不再提供后端代理。
+也可以通过 `VITE_BINANCE_API_BASE` 覆盖请求前缀，例如设置成 `https://example.com/eapi`。本项目不再提供 Node 后端服务。
