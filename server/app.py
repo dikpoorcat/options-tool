@@ -6,10 +6,7 @@ import time
 from flask import Flask, jsonify
 from flask_cors import CORS
 
-try:
-    from .binance import fetch_btc_put_snapshot
-except ImportError:
-    from binance import fetch_btc_put_snapshot
+from binance import fetch_btc_put_snapshot
 
 
 def create_app() -> Flask:
