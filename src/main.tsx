@@ -53,7 +53,7 @@ function App() {
   const { snapshot, error, loading, reload } = useOptionSnapshot();
   const [margin, setMargin] = React.useState(10000);
   const [referencePrice, setReferencePrice] = React.useState<number | "">("");
-  const [strikeCount, setStrikeCount] = React.useState(4);
+  const [strikeCount, setStrikeCount] = React.useState(6);
   const [strikeInterval, setStrikeInterval] = React.useState(1000);
   const [yieldMode, setYieldMode] = React.useState<YieldMode>("actual");
   const [lockedStrikes, setLockedStrikes] = React.useState<number[]>([]);
