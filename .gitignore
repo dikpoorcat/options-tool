@@ -49,6 +49,12 @@ web_modules/
 *.tsbuildinfo
 .vite/
 
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+
 # Optional npm cache directory
 .npm
 
