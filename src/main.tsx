@@ -109,7 +109,7 @@ function App() {
             type="number"
             value={referencePrice}
             onChange={(event) => setReferencePrice(event.target.value === "" ? "" : Number(event.target.value))}
-            min="1"
+            min="0"
             step="100"
           />
         </label>
@@ -119,7 +119,7 @@ function App() {
             type="number"
             value={margin}
             onChange={(event) => setMargin(Math.max(1, Number(event.target.value)))}
-            min="1"
+            min="0"
             step="100"
           />
         </label>
