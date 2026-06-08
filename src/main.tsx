@@ -133,7 +133,7 @@ function App() {
             value={referencePrice}
             onChange={(event) => setReferencePrice(event.target.value === "" ? "" : Number(event.target.value))}
             min="0"
-            step="100"
+            step="500"
           />
         </label>
         <label>

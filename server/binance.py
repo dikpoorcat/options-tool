@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-import platform
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Any
 
@@ -10,6 +10,7 @@ import requests
 
 BASE_URL = "https://eapi.binance.com"
 DAY_MS = 24 * 60 * 60 * 1000
+REQUEST_TIMEOUT = float(os.environ.get("BINANCE_REQUEST_TIMEOUT", "10"))
 
 last_good_snapshot: dict[str, Any] | None = None
 
@@ -33,47 +34,20 @@ def normalize_proxy_url(value: str | None) -> str | None:
     return f"http://{proxy_value}"
 
 
-def read_windows_proxy() -> str | None:
-    if platform.system() != "Windows":
-        return None
-
-    try:
-        import winreg
-
-        path = r"Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, path) as key:
-            proxy_enabled = winreg.QueryValueEx(key, "ProxyEnable")[0]
-            if proxy_enabled != 1:
-                return None
-            proxy_server = winreg.QueryValueEx(key, "ProxyServer")[0]
-            return normalize_proxy_url(str(proxy_server))
-    except OSError:
-        return None
-
-
 def get_proxy_url() -> str | None:
-    return (
-        normalize_proxy_url(os.environ.get("HTTPS_PROXY"))
-        or normalize_proxy_url(os.environ.get("HTTP_PROXY"))
-        or normalize_proxy_url(os.environ.get("ALL_PROXY"))
-        or read_windows_proxy()
-    )
+    return normalize_proxy_url(os.environ.get("BINANCE_PROXY", "http://127.0.0.1:7890"))
 
 
 def request_json(path: str) -> Any:
     proxy_url = get_proxy_url()
-    if proxy_url:
-        try:
-            return request_json_with_proxy(path, proxy_url)
-        except requests.RequestException:
-            return request_json_with_proxy(path, None)
-
-    return request_json_with_proxy(path, None)
+    if not proxy_url:
+        raise RuntimeError("BINANCE_PROXY is not configured")
+    return request_json_with_proxy(path, proxy_url)
 
 
 def request_json_with_proxy(path: str, proxy_url: str | None) -> Any:
     proxies = {"http": proxy_url, "https": proxy_url} if proxy_url else None
-    response = requests.get(f"{BASE_URL}{path}", proxies=proxies, timeout=30)
+    response = requests.get(f"{BASE_URL}{path}", proxies=proxies, timeout=REQUEST_TIMEOUT)
     if not response.ok:
         raise RuntimeError(f"{path} {response.status_code}")
     return response.json()
@@ -121,11 +95,13 @@ def fetch_btc_put_snapshot(now_ms: int | None = None) -> dict[str, Any]:
     now = now_ms or int(time.time() * 1000)
 
     try:
-        exchange_info, marks, index = (
-            request_json("/eapi/v1/exchangeInfo"),
-            request_json("/eapi/v1/mark"),
-            request_json("/eapi/v1/index?underlying=BTCUSDT"),
-        )
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            exchange_info_future = executor.submit(request_json, "/eapi/v1/exchangeInfo")
+            marks_future = executor.submit(request_json, "/eapi/v1/mark")
+            index_future = executor.submit(request_json, "/eapi/v1/index?underlying=BTCUSDT")
+            exchange_info = exchange_info_future.result()
+            marks = marks_future.result()
+            index = index_future.result()
 
         mark_by_symbol = {item.get("symbol"): to_number(item.get("markPrice")) for item in marks}
         contracts = []

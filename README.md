@@ -7,7 +7,7 @@
 ## 架构
 
 - 前端：Vite + React + TypeScript
-- 后端：Flask + Python
+- 后端：Flask + Python （部署在ALY，已开机自动启动）
 - 本地 API：`GET /api/options/btc-put`
 
 前端仍然通过 `/api` 请求后端；开发环境下 Vite 会把 `/api` 代理到 Flask 的 `127.0.0.1:8787`。

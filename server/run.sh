@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Usage:
+# ./run.sh start
+# ./run.sh status
+# ./run.sh restart
+# ./run.sh stop
+
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=${PROJECT_ROOT:-$SCRIPT_DIR}
 
@@ -8,18 +14,18 @@ PORT=${PORT:-8787}
 APP_DIR=${APP_DIR:-$PROJECT_ROOT}
 LOG_DIR=${LOG_DIR:-/root/Code/hundao_app/log/2_options_calc}
 PYTHON_GUNICORN=${PYTHON_GUNICORN:-/root/Code/venv_313/bin/gunicorn}
+ENV_BINANCE_PROXY=${ENV_BINANCE_PROXY:-http://127.0.0.1:7890}
+ENV_BINANCE_REQUEST_TIMEOUT=${ENV_BINANCE_REQUEST_TIMEOUT:-10}
 
 export PYTHONPATH="$APP_DIR:$PROJECT_ROOT:$PYTHONPATH"
 GREP_KEYWORD=${GREP_KEYWORD:-$APP}
 
-# Optional proxy for servers that cannot access Binance directly.
-# Example:
-# export HTTPS_PROXY=http://127.0.0.1:7890
-# export HTTP_PROXY=http://127.0.0.1:7890
+# Binance requests always use BINANCE_PROXY. This script does not start or stop clash.
 
 ACCESS_LOG_FORMAT='%({X-Real-IP}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" '
 
 CMDLINE_EXC="nohup \
+env BINANCE_PROXY=$ENV_BINANCE_PROXY BINANCE_REQUEST_TIMEOUT=$ENV_BINANCE_REQUEST_TIMEOUT \
 $PYTHON_GUNICORN \
 --chdir $APP_DIR \
 -w 2 -b 127.0.0.1:$PORT $APP \
