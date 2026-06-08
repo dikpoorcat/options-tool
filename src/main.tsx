@@ -20,6 +20,20 @@ function formatPercent(value: number | null | undefined) {
   return `${formatNumber(value, value >= 100 ? 1 : 2)}%`;
 }
 
+function formatUpdatedAgo(timestamp: number | null | undefined, now: number) {
+  if (!timestamp) return "Waiting for data";
+
+  const elapsedSeconds = Math.max(0, Math.floor((now - timestamp) / 1000));
+  if (elapsedSeconds < 5) return `Updated just now (${new Date(timestamp).toLocaleTimeString("zh-CN")})`;
+  if (elapsedSeconds < 60) return `Updated ${elapsedSeconds}s ago (${new Date(timestamp).toLocaleTimeString("zh-CN")})`;
+
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) return `Updated ${elapsedMinutes}m ago (${new Date(timestamp).toLocaleTimeString("zh-CN")})`;
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  return `Updated ${elapsedHours}h ago (${new Date(timestamp).toLocaleTimeString("zh-CN")})`;
+}
+
 function useOptionSnapshot() {
   const [snapshot, setSnapshot] = React.useState<OptionSnapshot | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -57,6 +71,12 @@ function App() {
   const [strikeInterval, setStrikeInterval] = React.useState(1000);
   const [yieldMode, setYieldMode] = React.useState<YieldMode>("actual");
   const [lockedStrikes, setLockedStrikes] = React.useState<number[]>([]);
+  const [now, setNow] = React.useState(Date.now());
+
+  React.useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   React.useEffect(() => {
     if (referencePrice === "" && snapshot?.indexPrice) {
@@ -157,7 +177,7 @@ function App() {
       </section>
 
       <section className="status-line">
-        <span>{snapshot ? `Updated ${new Date(snapshot.updatedAt).toLocaleTimeString("zh-CN")}` : "Waiting for data"}</span>
+        <span>{formatUpdatedAgo(snapshot?.updatedAt, now)}</span>
         {snapshot?.stale ? <strong>Showing last successful snapshot</strong> : null}
         {error ? <strong>{error}</strong> : null}
       </section>
