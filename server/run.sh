@@ -1,13 +1,26 @@
 #!/bin/bash
 
-PROJECT_ROOT=${PROJECT_ROOT:-/root/Code/hundao_app/apps/2_options_calc}
-export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+PROJECT_ROOT=${PROJECT_ROOT:-$SCRIPT_DIR}
 
-APP=${APP:-server.app:app}
 PORT=${PORT:-8787}
-APP_DIR=${APP_DIR:-$PROJECT_ROOT}
 LOG_DIR=${LOG_DIR:-/root/Code/hundao_app/log/2_options_calc}
 PYTHON_GUNICORN=${PYTHON_GUNICORN:-/root/Code/venv_313/bin/gunicorn}
+
+if [ -z "$APP_DIR" ] || [ -z "$APP" ]; then
+    if [ -f "$PROJECT_ROOT/server/app.py" ]; then
+        APP_DIR=${APP_DIR:-$PROJECT_ROOT}
+        APP=${APP:-server.app:app}
+    elif [ -f "$PROJECT_ROOT/app.py" ]; then
+        APP_DIR=${APP_DIR:-$PROJECT_ROOT}
+        APP=${APP:-app:app}
+    else
+        APP_DIR=${APP_DIR:-$PROJECT_ROOT}
+        APP=${APP:-server.app:app}
+    fi
+fi
+
+export PYTHONPATH="$APP_DIR:$PROJECT_ROOT:$PYTHONPATH"
 GREP_KEYWORD=${GREP_KEYWORD:-$APP}
 
 # Optional proxy for servers that cannot access Binance directly.
