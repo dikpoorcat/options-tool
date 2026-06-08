@@ -66,6 +66,30 @@ npm run start
 
 `npm run start` 只启动 Flask 后端；生产环境中可以用 Nginx 托管 `dist/`，再把 `/api` 反代到 Flask 后端。
 
+## 服务器后端脚本
+
+`server/run.sh` 是给服务器使用的 Gunicorn 启停脚本，默认假设后端项目目录为：
+
+```text
+/root/Code/hundao_app/apps/2_options_calc
+```
+
+常用命令：
+
+```bash
+chmod +x server/run.sh
+server/run.sh start
+server/run.sh status
+server/run.sh restart
+server/run.sh stop
+```
+
+如果服务器路径不同，可以在执行前覆盖变量，例如：
+
+```bash
+PROJECT_ROOT=/root/Code/hundao_app/apps/2_options_calc PORT=8787 server/run.sh restart
+```
+
 ## 数据来源
 
 后端代理请求 Binance Options 公共接口：
