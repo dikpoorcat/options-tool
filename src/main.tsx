@@ -6,6 +6,7 @@ import type { OptionSnapshot, YieldMode } from "./types";
 import "./styles.css";
 
 const REFRESH_MS = 30_000;
+const API_BASE = import.meta.env.BASE_URL;
 
 function formatNumber(value: number | null | undefined, digits = 0) {
   if (value === null || value === undefined || !Number.isFinite(value)) return "-";
@@ -42,7 +43,7 @@ function useOptionSnapshot() {
   const load = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/options/btc-put");
+      const response = await fetch(`${API_BASE}api/options/btc-put`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Load failed");
       setSnapshot(data);
@@ -121,52 +122,54 @@ function App() {
       </section>
 
       <section className="controls">
-        <label>
-          <span>BTC Index</span>
-          <output>{formatNumber(snapshot?.indexPrice, 2)} USDT</output>
-        </label>
-        <label>
-          <span>Reference</span>
-          <input
-            type="number"
-            value={referencePrice}
-            onChange={(event) => setReferencePrice(event.target.value === "" ? "" : Number(event.target.value))}
-            min="0"
-            step="100"
-          />
-        </label>
-        <label>
-          <span>Margin / Contract</span>
-          <input
-            type="number"
-            value={margin}
-            onChange={(event) => setMargin(Math.max(1, Number(event.target.value)))}
-            min="0"
-            step="100"
-          />
-        </label>
-        <label>
-          <span>Nearby Strikes</span>
-          <input
-            type="number"
-            value={strikeCount}
-            onChange={(event) => setStrikeCount(Math.max(1, Math.min(12, Number(event.target.value))))}
-            min="1"
-            max="12"
-          />
-        </label>
-        <label>
-          <span>Strike Interval</span>
-          <select value={strikeInterval} onChange={(event) => setStrikeInterval(Number(event.target.value))}>
-            <option value="100">100</option>
-            <option value="250">250</option>
-            <option value="500">500</option>
-            <option value="1000">1000</option>
-            <option value="2500">2500</option>
-            <option value="5000">5000</option>
-          </select>
-        </label>
-        <div className="segmented" role="group" aria-label="Yield mode">
+        <div className="control-grid">
+          <label className="control-field">
+            <span>BTC Index</span>
+            <output>{formatNumber(snapshot?.indexPrice, 2)} USDT</output>
+          </label>
+          <label className="control-field">
+            <span>Reference</span>
+            <input
+              type="number"
+              value={referencePrice}
+              onChange={(event) => setReferencePrice(event.target.value === "" ? "" : Number(event.target.value))}
+              min="0"
+              step="500"
+            />
+          </label>
+          <label className="control-field">
+            <span>Margin / Contract</span>
+            <input
+              type="number"
+              value={margin}
+              onChange={(event) => setMargin(Math.max(1, Number(event.target.value)))}
+              min="0"
+              step="100"
+            />
+          </label>
+          <label className="control-field">
+            <span>Nearby Strikes</span>
+            <input
+              type="number"
+              value={strikeCount}
+              onChange={(event) => setStrikeCount(Math.max(1, Math.min(12, Number(event.target.value))))}
+              min="1"
+              max="12"
+            />
+          </label>
+          <label className="control-field">
+            <span>Strike Interval</span>
+            <select value={strikeInterval} onChange={(event) => setStrikeInterval(Number(event.target.value))}>
+              <option value="100">100</option>
+              <option value="250">250</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+              <option value="2500">2500</option>
+              <option value="5000">5000</option>
+            </select>
+          </label>
+        </div>
+        <div className="mode-toggle" role="group" aria-label="Yield mode">
           <button className={yieldMode === "actual" ? "active" : ""} onClick={() => setYieldMode("actual")}>
             Actual Yield
           </button>
@@ -186,7 +189,7 @@ function App() {
         <table>
           <thead>
             <tr>
-              <th className="sticky">Expiry</th>
+              <th className="expiry-col">Expiry</th>
               <th>Days</th>
               {selectedStrikes.map((strike) => (
                 <th key={strike}>
@@ -208,7 +211,7 @@ function App() {
           <tbody>
             {rows.map((row) => (
               <tr key={row.expiry}>
-                <th className="sticky row-title">{row.expiryLabel}</th>
+                <th className="expiry-col row-title">{row.expiryLabel}</th>
                 <td className="days">{formatNumber(row.daysToExpiry, 4)}</td>
                 {selectedStrikes.map((strike) => {
                   const cell = row.cells[strike];
